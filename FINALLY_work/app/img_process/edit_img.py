@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image, ImageDraw 
 import math
 import os
-
+import cv2
 
 
 def inkassator_img(img_url) -> Image.Image:
@@ -35,6 +35,7 @@ def inkassator_img(img_url) -> Image.Image:
 # metod 1
 def change_contrast1(img_url, c)->Image.Image:
     """Increases or decreases contrast of an image by modifying pixel values."""
+    c = float(c)
     image = Image.open('app/static/uploaded_files/'+img_url) 
 
     bands = image.getbands()
@@ -97,4 +98,27 @@ def change_contrast2(img_url, c=1, gamma=2)->Image.Image:
                 pix1[i,j]=int(T)
 
     img_new.save(os.getcwd()+'/app/static/result_files/img1.png')
+    return 'result_files/img1.png'
+
+
+
+#img convert RGB to Grayscale
+def convertImgRgb2Gray(img_url)->Image.Image:
+    """Increases or decreases contrast of an image by modifying pixel values."""
+    image = Image.open('app/static/uploaded_files/'+img_url).convert('L')
+    image.save(os.getcwd()+'/app/static/result_files/img1.png')
+    return 'result_files/img1.png'
+
+
+#img convert Grayscale to RGB  
+def convertImgGray2Rgb(img_url)->Image.Image:
+    """Converts a grayscale image into RGB image"""
+    # Load grayscale  image as B&W (Black and White)
+    img_gray = cv2.imread('app/static/uploaded_files/'+img_url, cv2.IMREAD_GRAYSCALE)
+
+    # Convert grayscale to RGB
+    img_rgb = cv2.cvtColor(img_gray, cv2.COLOR_GRAY2RGB)
+
+    # Save RGB image
+    cv2.imwrite(os.getcwd()+'/app/static/result_files/img1.png', img_rgb)
     return 'result_files/img1.png'

@@ -8,10 +8,14 @@
         <img width="400px" src={{url_for('static', filename=imgs[i]) }}>
         <div class="card-body">
           <h5 class="card-title">{{comments[i]}}</h5>
+          <a class="btn btn-primary" href={{url_for('static', filename=imgs[i])}} download>Download img</a>
         </div>
       </div>
     {%endfor%}
   </div>
-  <a class="text-center" href="/">Go back home</a>
+  <br>
+  <div class="d-flex justify-content-center">
+    <a class="btn btn-primary" href="/">Go back home</a>
+  </div>
 </div>
 {% endblock %}

@@ -7,13 +7,13 @@ from app.img_routines import *
 # from backend.models import User
 from flask import request, redirect, render_template, url_for, send_file, send_from_directory
 from app import app, ALLOWED_EXTENSIONS
-from app.img_process.edit_img import change_contrast1, change_contrast2
 import shutil
 
-# IMG_FOLDER = os.path.join("static", "uploaded_files")
+#edit 1
+from app.img_process.edit_img import change_contrast1, change_contrast2, convertImgRgb2Gray, convertImgGray2Rgb
 
-# app.config["UPLOAD_FOLDER"] = IMG_FOLDER
-
+#edit 2 - affin
+from app.img_process.affin_transformation import parallel_transfer, rotate_img
 
 @app.route("/")
 def landing():
@@ -32,6 +32,7 @@ def remove_static_files(file_path):
                 shutil.rmtree(file_path)
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
+
 
 @app.route('/edit_kontrast', methods=['GET', 'POST'])
 def edit_kontrast():
@@ -64,8 +65,18 @@ def edit_kontrast():
                     imgs = ['uploaded_files/'+INPUT_FILENAME, new_img]
                     comments = ['Orginal tasvir', 'Ishlangan tasvir']
                     return render_template('result.html', imgs=imgs, len=len(imgs), comments=comments)
+                elif method == 'method3':
+                    new_img = convertImgRgb2Gray(INPUT_FILENAME)
+                    imgs = ['uploaded_files/'+INPUT_FILENAME, new_img]
+                    comments = ['Orginal tasvir', 'Ishlangan tasvir']
+                    return render_template('result.html', imgs=imgs, len=len(imgs), comments=comments)
+                elif method == 'method4':
+                    new_img = convertImgGray2Rgb(INPUT_FILENAME)
+                    imgs = ['uploaded_files/'+INPUT_FILENAME, new_img]
+                    comments = ['Orginal tasvir', 'Ishlangan tasvir']
+                    return render_template('result.html', imgs=imgs, len=len(imgs), comments=comments)
                 else:
-                    return render_template('error.html', message=e)
+                    return render_template('error.html')
 
             except Exception as e :
                 print(e)
@@ -78,8 +89,9 @@ def edit_kontrast():
 
 @app.route('/affin_transformation', methods=['GET', 'POST'])
 def affin_transformation():
+    remove_static_files('uploaded_files')
+    remove_static_files('result_files')
     global INPUT_FILENAME
-    filemessage = "Upload an image..."
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -94,11 +106,31 @@ def affin_transformation():
             INPUT_FILENAME = filename
             try:
                 working_directory = os.getcwd()
-                file.save(working_directory + "/uploaded_files/" + filename)
-            except FileNotFoundError :
-                return 'Error, folder does not exist'
+                file.save(working_directory + "/app/static/uploaded_files/" + filename)
+                method = request.form.get('method')
+                if method == 'method1' :
+                    new_img = parallel_transfer(INPUT_FILENAME, request.form.get('x'), request.form.get('y'))
+                    imgs = ['uploaded_files/'+INPUT_FILENAME, new_img]
+                    comments = ['Orginal tasvir', 'Ishlangan tasvir']
+                    return render_template('result.html', imgs=imgs, len=len(imgs), comments=comments)
+                elif method == 'method2':
+                    new_img = rotate_img(INPUT_FILENAME, request.form.get('angle'))
+                    imgs = ['uploaded_files/'+INPUT_FILENAME, new_img]
+                    comments = ['Orginal tasvir', 'Ishlangan tasvir']
+                    return render_template('result.html', imgs=imgs, len=len(imgs), comments=comments)
+                # elif method == 'method3':
+                #     new_img = convertImgRgb2Gray(INPUT_FILENAME)
+                #     imgs = ['uploaded_files/'+INPUT_FILENAME, new_img]
+                #     comments = ['Orginal tasvir', 'Ishlangan tasvir']
+                #     return render_template('result.html', imgs=imgs, len=len(imgs), comments=comments)
+                else:
+                    return render_template('error.html')
 
-        return redirect(url_for('uploaded'))
+            except Exception as e :
+                print(e)
+                return render_template('error.html', message=e)
+        return render_template('error.html', message="This img file is not supported.")
+        # return redirect(url_for('result.html'))
                 
     return render_template('editor2.html')
 
