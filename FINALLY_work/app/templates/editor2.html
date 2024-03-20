@@ -1,0 +1,121 @@
+{% extends 'base.html' %} {% block title %}ImageApp - Editor{% endblock %} {%
+    block content %}
+    
+    <h1 class="text-center">Affen almashtrish</h1>
+    
+    <div class="container">
+      <div class="card p-2">
+        <div class="d-flex justify-content-between">
+          <h2>Parallel surish</h2>
+          <div>
+            <p class="fs-4">x = v + t_x</p>
+            <p class="fs-4">y = w + t_y </p>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="" method="post">
+            <h5>Upload img</h5>
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="inputGroupFile01">Upload</label>
+              <input type="file" class="form-control" id="inputGroupFile01"required />
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">x</label>
+              <input
+                type="number"
+                class="form-control"
+                id="exampleFormControlInput1"
+                value="1"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">y</label>
+              <input
+                type="number"
+                class="form-control"
+                id="exampleFormControlInput1"
+                value="1"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    
+
+      <div class="card p-2 mt-3">
+        <div class="d-flex justify-content-between">
+          <h2>Rasmni burish</h2>
+          <div>
+            <p class="fs-5">x = v*cos_0 - w*sin_0</p>
+            <p class="fs-5">y = v*sin_0 - w*cos_0</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="" method="post">
+            <h5>Upload img</h5>
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="inputGroupFile01">Upload</label>
+              <input type="file" class="form-control" id="inputGroupFile01" required/>
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">Gradus</label>
+              <input
+                type="number"
+                class="form-control"
+                id="exampleFormControlInput1"
+                value="1.0"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+
+
+      <div class="card p-2 mt-3">
+        <div class="d-flex justify-content-between">
+          <h2>Masshtablash (Scaling)</h2>
+          <div>
+            <p class="fs-5">x′ = c_x * x</p>
+            <p class="fs-5">y′ = c_y * y</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="" method="post">
+            <h5>Upload img</h5>
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="inputGroupFile01">Upload</label>
+              <input type="file" class="form-control" id="inputGroupFile01" accept="image/png, image/jpeg, image/jpg, image/tif" required/>
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">x</label>
+              <input
+                type="number"
+                class="form-control"
+                id="exampleFormControlInput1"
+                value="1.0"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">y</label>
+              <input
+                type="number"
+                class="form-control"
+                id="exampleFormControlInput1"
+                value="1.0"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    {% endblock %}
+    

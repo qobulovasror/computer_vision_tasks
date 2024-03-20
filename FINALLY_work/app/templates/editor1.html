@@ -1,0 +1,104 @@
+{% extends 'base.html' %} {% block title %}ImageApp - Editor{% endblock %} {%
+block content %}
+
+<h1 class="text-center">Kontrastni o'zgatrish</h1>
+
+<div class="container">
+  <div class="card p-2">
+    <form method="POST" enctype="multipart/form-data">
+      <div class="d-flex justify-content-between">
+        <h2>Metod 1</h2>
+        <div>
+          <p class="fs-4">S = c * lg( 1 + r), r = pix[i, j] ( r ≥ 0 )</p>
+          <p class="fs-4">
+            c - constant and assumed,(константа и предполагается)
+          </p>
+        </div>
+      </div>
+      <div class="card-body">
+        <h5>Upload img</h5>
+        <input type="hidden" name="method" value="method1" />
+        <div class="input-group mb-3">
+          <label class="input-group-text" for="inputGroupFile01">Upload</label>
+          <input
+            type="file"
+            name="file"
+            class="form-control"
+            id="inputGroupFile01"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="exampleFormControlInput1" class="form-label">C</label>
+          <input
+            type="number"
+            name="c"
+            class="form-control"
+            id="exampleFormControlInput1"
+            value="1"
+            step="0.01"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card p-2 mt-3">
+    <div class="d-flex justify-content-between">
+      <h2>Metod 2</h2>
+      <div>
+        <p class="fs-5">
+          S = c * (r ^ gamma) / (255 ^ (gamma-1)), r = pix[i, j]
+        </p>
+        <p class="fs-5">
+          c, γ - positive constants, (c и γ являются положительными константами)
+        </p>
+      </div>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        <h5>Upload img</h5>
+        <input type="hidden" name="method" value="method2" />
+        <div class="input-group mb-3">
+          <label class="input-group-text" for="inputGroupFile01">Upload</label>
+          <input
+            type="file"
+            name="file"
+            class="form-control"
+            id="inputGroupFile01"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="exampleFormControlInput1" class="form-label">C</label>
+          <input
+            name="c"
+            type="number"
+            class="form-control"
+            id="exampleFormControlInput1"
+            value="1.0"
+            step="0.01"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="exampleFormControlInput1" class="form-label">Gamma</label>
+          <input
+            name="gamma"
+            type="number"
+            class="form-control"
+            id="exampleFormControlInput1"
+            value="1.0"
+            step="0.01"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

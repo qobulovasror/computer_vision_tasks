@@ -5,13 +5,107 @@ import re
 from werkzeug.utils import secure_filename
 from app.img_routines import *
 # from backend.models import User
-from flask import request, redirect, render_template, url_for, send_file
+from flask import request, redirect, render_template, url_for, send_file, send_from_directory
 from app import app, ALLOWED_EXTENSIONS
+from app.img_process.edit_img import change_contrast1, change_contrast2
+import shutil
+
+# IMG_FOLDER = os.path.join("static", "uploaded_files")
+
+# app.config["UPLOAD_FOLDER"] = IMG_FOLDER
 
 
-@app.route('/')
+@app.route("/")
 def landing():
-    return render_template('index.html')
+    return render_template("index.html")
+
+
+def remove_static_files(file_path):
+    folder = 'app/static/'+file_path
+    # for file in os.listdir(folder):
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+@app.route('/edit_kontrast', methods=['GET', 'POST'])
+def edit_kontrast():
+    remove_static_files('uploaded_files')
+    remove_static_files('result_files')
+    global INPUT_FILENAME
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return redirect(request.url)
+        
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        # if user does not select file, browser also submit an empty part without filename
+        if file.filename == '':
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            INPUT_FILENAME = filename
+            try:
+                working_directory = os.getcwd()
+                file.save(working_directory + "/app/static/uploaded_files/" + filename)
+                method = request.form.get('method')
+                if method == 'method1' :
+                    new_img = change_contrast1(INPUT_FILENAME, request.form.get('c'))
+                    imgs = ['uploaded_files/'+INPUT_FILENAME, new_img]
+                    comments = ['Orginal tasvir', 'Ishlangan tasvir']
+                    return render_template('result.html', imgs=imgs, len=len(imgs), comments=comments)
+                elif method == 'method2':
+                    new_img = change_contrast2(INPUT_FILENAME, request.form.get('c'), request.form.get('gamma') )
+                    imgs = ['uploaded_files/'+INPUT_FILENAME, new_img]
+                    comments = ['Orginal tasvir', 'Ishlangan tasvir']
+                    return render_template('result.html', imgs=imgs, len=len(imgs), comments=comments)
+                else:
+                    return render_template('error.html', message=e)
+
+            except Exception as e :
+                print(e)
+                return render_template('error.html', message=e)
+        return render_template('error.html', message="This img file is not supported.")
+        # return redirect(url_for('result.html'))
+                
+    return render_template('editor1.html')
+
+
+@app.route('/affin_transformation', methods=['GET', 'POST'])
+def affin_transformation():
+    global INPUT_FILENAME
+    filemessage = "Upload an image..."
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return redirect(request.url)
+        
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        # if user does not select file, browser also submit an empty part without filename
+        if file.filename == '':
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            INPUT_FILENAME = filename
+            try:
+                working_directory = os.getcwd()
+                file.save(working_directory + "/uploaded_files/" + filename)
+            except FileNotFoundError :
+                return 'Error, folder does not exist'
+
+        return redirect(url_for('uploaded'))
+                
+    return render_template('editor2.html')
+
+
+
+
+
 
 
 def allowed_file(filename):
@@ -41,12 +135,6 @@ def add_header(response):
     return response
 
 
-def remove_static_files():
-    CLEANUP_FOLDER = os.getcwd() + 'static/uploads/'
-    files = glob.glob(CLEANUP_FOLDER)
-    for f in files:
-        os.remove(f)
-
 
 # Image editing home
 @app.route('/upload', methods=['GET', 'POST'])
@@ -55,26 +143,29 @@ def uploadimage():
     remove_static_files()
     filemessage = "Upload an image..."
     if request.method == 'POST':
-        submit_button = request.form.get('submit_button')
-        if submit_button == 'upload_image':
-            # check if the post request has the file part
-            if 'file' not in request.files:
-                return redirect(request.url)
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return redirect(request.url)
+        
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        # if user does not select file, browser also submit an empty part without filename
+        if file.filename == '':
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            INPUT_FILENAME = filename
+            try:
+                working_directory = os.getcwd()
+                file.save(working_directory + "/uploaded_files/" + filename)
+            except FileNotFoundError :
+                return 'Error, folder does not exist'
 
-            file = request.files['file']
-            filemessage = secure_filename(file.filename)
-            # if user does not select file, browser also
-            # submit an empty part without filename
-            if file.filename == '':
-                return redirect(request.url)
-
-            if file and allowed_file(file.filename):
-                INPUT_FILENAME = secure_filename(file.filename)
-                # print(app.config['UPLOAD_FOLDER'])
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], INPUT_FILENAME))
-                dupe_image(os.path.join(app.config['UPLOAD_FOLDER'], INPUT_FILENAME), 'copy')
-                refresh_parameters(os.path.join(app.config['UPLOAD_FOLDER'], INPUT_FILENAME))
-                return redirect(url_for('uploaded'))
+        return redirect(url_for('uploaded'))
+            
+            # file.save(os.path.join(app.config['UPLOAD_FOLDER'], INPUT_FILENAME))
+            # dupe_image(os.path.join(app.config['UPLOAD_FOLDER'], INPUT_FILENAME), 'copy')
+            # refresh_parameters(os.path.join(app.config['UPLOAD_FOLDER'], INPUT_FILENAME))
+                
 
     return render_template('upload.html', filemessage=filemessage)
 
@@ -150,8 +241,15 @@ def uploaded():
 @app.route('/gallery')
 def gallery():
     images = []
-    for root, dirs, files in os.walk(app.config['UPLOAD_FOLDER']):
-        for file in files:
-            if file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg"):
-                images.append(file)
+    # for root, dirs, files in os.walk(app.config['UPLOAD_FOLDER']):
+    
+    for file in os.listdir('uploaded_files'):
+        if file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg"):
+            images.append(file)
+    # for (root, dirs, files) in os.walk('/uploaded_files/'):
+        # print("1")
+        # for file in files:
+        #     if file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg"):
+        #         images.append(file)
+
     return render_template('gallery.html', images=images, len=len(images))
